@@ -9,6 +9,25 @@ Multi-channel автопостинг новостей об ИИ: парсинг 
 
 ![Пайплайн news-cast-ai](assets/pipeline.svg)
 
+## 🖼 Результаты
+
+Секция «Новости AI» и страницы статей, которые пайплайн генерирует и деплоит на статический сайт business_card (скриншоты лежат в `docs/screenshots/`):
+
+| Скриншот | Что видно |
+|---|---|
+| ![Главная сайта с секцией новостей](docs/screenshots/site-main.png) | Главная сайта: секция «Новости AI» с датами и заголовками |
+| ![Секция новостей на главной](docs/screenshots/site-news-section.png) | Секция «Новости AI» крупным планом |
+| ![Секция новостей на живом сайте](docs/screenshots/site-news-live.png) | Живой сайт после деплоя: карточки новостей + ссылка «Все новости — в Дзене» |
+
+## 🧠 Skills (Claude Code)
+
+Промпты-скиллы, на которых построен конвейер, лежат в `docs/skills/` — это те же файлы, что живут в `.claude/skills/` (рабочая копия, не попадает в git):
+
+| Скилл | Назначение |
+|---|---|
+| [`content-adaptor`](docs/skills/content-adaptor/SKILL.md) | Адаптация одной статьи под 4 канала (Telegram, VK, Дзен, сайт/блог): summary, черновики публикаций и промпт для генерации картинки — единый JSON (schema `content-adaptor/v2`) |
+| [`news-multi-publisher`](docs/skills/news-multi-publisher/SKILL.md) | Оркестрация полного конвейера: парсинг из нескольких источников → двухэтапная адаптация (Ollama Cloud: Flash для summary, Pro для social-блоков) → картинки → публикация |
+
 ## 🏗 Архитектура
 
 ```
@@ -97,6 +116,9 @@ news_cast_ai/
 │   ├── http.js             # fetchWithTimeout
 │   ├── retry.js            # retryWithBackoff
 │   └── rateLimit.js        # per-name гейт
+├── docs/
+│   ├── screenshots/        # скриншоты результата (секция «Новости AI» на сайте)
+│   └── skills/             # промпты-скиллы Claude Code (копия .claude/skills/)
 ├── sessions/               # исходники статей (генерируется)
 ├── posts/                  # JSON-адаптации (генерируется)
 ├── images/                 # PNG-картинки img-<hash16>.png (генерируется)
