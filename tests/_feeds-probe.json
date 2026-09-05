@@ -1,0 +1,39 @@
+[
+  {
+    "url": "https://venturebeat.com/category/orchestration",
+    "ok": false,
+    "error": "HTTP 429"
+  },
+  {
+    "url": "https://habr.com/ru/hubs/artificial_intelligence/articles/",
+    "ok": true,
+    "status": 200,
+    "ct": "text/html; charset=utf-8",
+    "finalUrl": "https://habr.com/ru/hubs/artificial_intelligence/articles/",
+    "isXml": false,
+    "len": 283263
+  },
+  {
+    "url": "https://openai.com/ru-RU/news/",
+    "ok": false,
+    "error": "HTTP 403"
+  },
+  {
+    "url": "https://www.marktechpost.com/",
+    "ok": true,
+    "status": 200,
+    "ct": "text/html; charset=UTF-8",
+    "finalUrl": "https://www.marktechpost.com/",
+    "isXml": false,
+    "len": 593279
+  },
+  {
+    "url": "https://spectrum.ieee.org/topic/artificial-intelligence/",
+    "ok": true,
+    "status": 200,
+    "ct": "text/html; charset=utf-8",
+    "finalUrl": "https://spectrum.ieee.org/topic/artificial-intelligence/",
+    "isXml": false,
+    "len": 422877
+  }
+]

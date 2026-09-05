@@ -1,0 +1,71 @@
+{
+  "venturebeat": [
+    {
+      "url": "https://venturebeat.com/category/orchestration/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml",
+      "finalUrl": "https://venturebeat.com/category/orchestration/feed",
+      "isFeed": true,
+      "items": 7,
+      "latest": "2026-08-22T21:30:00.000Z"
+    },
+    {
+      "url": "https://venturebeat.com/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml",
+      "finalUrl": "https://venturebeat.com/feed",
+      "isFeed": true,
+      "items": 7,
+      "latest": "2026-08-22T21:30:00.000Z"
+    },
+    {
+      "url": "https://venturebeat.com/category/ai/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml",
+      "finalUrl": "https://venturebeat.com/category/ai/feed",
+      "isFeed": true,
+      "items": 7,
+      "latest": "2026-08-19T14:18:12.000Z"
+    },
+    {
+      "url": "https://venturebeat.com/?feed=rss2",
+      "ok": false,
+      "status": 429
+    }
+  ],
+  "openai": [
+    {
+      "url": "https://openai.com/news/rss.xml",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml; charset=utf-8",
+      "finalUrl": "https://openai.com/news/rss.xml",
+      "isFeed": true,
+      "items": 1143,
+      "latest": "2026-08-20T07:00:00.000Z"
+    },
+    {
+      "url": "https://openai.com/blog/rss.xml",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml; charset=utf-8",
+      "finalUrl": "https://openai.com/news/rss.xml",
+      "isFeed": true,
+      "items": 1143,
+      "latest": "2026-08-20T07:00:00.000Z"
+    },
+    {
+      "url": "https://openai.com/news/index.xml",
+      "ok": false,
+      "status": 403
+    },
+    {
+      "url": "https://openai.com/index.xml",
+      "ok": false,
+      "status": 404
+    }
+  ]
+}

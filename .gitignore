@@ -1,0 +1,43 @@
+# Файлы с секретами
+.env
+.env.local
+.env.*.local
+.env.txt
+# n8n/ OAuth-артефакты с access_token в открытом виде
+VK Oauth token.json
+scripts/.pkce-state.json
+
+# Логи и временные файлы
+*.log
+*.tmp
+.DS_Store
+
+# Папки зависимостей
+node_modules/
+vendor/
+
+# Файлы конфигурации IDE
+.idea/
+.vscode/
+*.swp
+
+# Генерируемые файлы
+dist/
+build/
+output/
+
+# Артефакты пайплайна (содержат сгенерированный контент и кэш картинок)
+sessions/
+posts/
+images/
+drafts/
+pending/
+_generated_posts/
+# Локальный реестр публикаций (содержит URL/slug уже опубликованных статей)
+database/
+!database/.gitkeep
+
+# Внутренние рабочие документы и локальная конфигурация
+STATUS.md
+.claude/
+node

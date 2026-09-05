@@ -1,0 +1,123 @@
+{
+  "habr": [
+    {
+      "url": "https://habr.com/ru/rss/all/hubs/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml; charset=utf-8",
+      "finalUrl": "https://habr.com/ru/rss/articles/",
+      "isFeed": true,
+      "items": 40,
+      "latest": "2026-08-23T16:16:03.000Z"
+    },
+    {
+      "url": "https://habr.com/ru/rss/hubs/artificial_intelligence/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml; charset=utf-8",
+      "finalUrl": "https://habr.com/ru/rss/hubs/artificial_intelligence/articles/all/",
+      "isFeed": true,
+      "items": 40,
+      "latest": "2026-08-23T16:16:04.000Z"
+    },
+    {
+      "url": "https://habr.com/ru/rss/all/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml; charset=utf-8",
+      "finalUrl": "https://habr.com/ru/rss/articles/",
+      "isFeed": true,
+      "items": 40,
+      "latest": "2026-08-23T16:16:03.000Z"
+    },
+    {
+      "url": "https://habr.com/ru/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/html; charset=utf-8",
+      "finalUrl": "https://habr.com/ru/feed/",
+      "isFeed": false,
+      "items": 0,
+      "latest": null
+    }
+  ],
+  "marktechpost": [
+    {
+      "url": "https://www.marktechpost.com/feed/",
+      "ok": false,
+      "status": 403
+    },
+    {
+      "url": "https://www.marktechpost.com/feed",
+      "ok": false,
+      "status": 403
+    },
+    {
+      "url": "https://www.marktechpost.com/?feed=rss2",
+      "ok": false,
+      "status": 403
+    },
+    {
+      "url": "https://www.marktechpost.com/rss.xml",
+      "ok": false,
+      "status": 403
+    }
+  ],
+  "ieee": [
+    {
+      "url": "https://spectrum.ieee.org/topic/artificial-intelligence/rss",
+      "ok": false,
+      "status": 404
+    },
+    {
+      "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+      "ok": true,
+      "status": 200,
+      "ct": "application/rss+xml; charset=utf-8",
+      "finalUrl": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+      "isFeed": true,
+      "items": 30,
+      "latest": "2026-08-21T18:00:01.000Z"
+    },
+    {
+      "url": "https://spectrum.ieee.org/rss/topic/artificial-intelligence/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/xml",
+      "finalUrl": "https://spectrum.ieee.org/customfeeds/feed/all-topics/rss",
+      "isFeed": true,
+      "items": 20,
+      "latest": "2026-08-23T13:00:01.000Z"
+    },
+    {
+      "url": "https://spectrum.ieee.org/topic/artificial-intelligence/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "application/rss+xml; charset=utf-8",
+      "finalUrl": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+      "isFeed": true,
+      "items": 30,
+      "latest": "2026-08-21T18:00:01.000Z"
+    },
+    {
+      "url": "https://spectrum.ieee.org/feed/",
+      "ok": true,
+      "status": 200,
+      "ct": "text/html; charset=utf-8",
+      "finalUrl": "https://spectrum.ieee.org/",
+      "isFeed": false,
+      "items": 0,
+      "latest": null
+    },
+    {
+      "url": "https://spectrum.ieee.org/rss/",
+      "ok": true,
+      "status": 200,
+      "ct": "application/rss+xml; charset=utf-8",
+      "finalUrl": "https://spectrum.ieee.org/feeds/feed.rss",
+      "isFeed": true,
+      "items": 30,
+      "latest": "2026-08-21T18:00:01.000Z"
+    }
+  ]
+}

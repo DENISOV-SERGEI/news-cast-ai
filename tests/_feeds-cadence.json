@@ -1,0 +1,67 @@
+{
+  "techcrunch_ai": {
+    "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "ok": true,
+    "status": 200,
+    "total": 20,
+    "last7": 20,
+    "last30": 20,
+    "last90": 20,
+    "perDay_30": 0.6666666666666666
+  },
+  "ai_news": {
+    "url": "https://www.artificialintelligence-news.com/feed",
+    "ok": false,
+    "status": 403
+  },
+  "deepmind": {
+    "url": "https://deepmind.google/blog/rss.xml",
+    "ok": true,
+    "status": 200,
+    "total": 100,
+    "last7": 1,
+    "last30": 7,
+    "last90": 23,
+    "perDay_30": 0.23333333333333334
+  },
+  "venturebeat_orch": {
+    "url": "https://venturebeat.com/category/orchestration/feed/",
+    "ok": true,
+    "status": 200,
+    "total": 7,
+    "last7": 7,
+    "last30": 7,
+    "last90": 7,
+    "perDay_30": 0.23333333333333334
+  },
+  "openai_news": {
+    "url": "https://openai.com/news/rss.xml",
+    "ok": true,
+    "status": 200,
+    "total": 1143,
+    "last7": 14,
+    "last30": 51,
+    "last90": 147,
+    "perDay_30": 1.7
+  },
+  "habr_ai": {
+    "url": "https://habr.com/ru/rss/hubs/artificial_intelligence/articles/all/",
+    "ok": true,
+    "status": 200,
+    "total": 41,
+    "last7": 41,
+    "last30": 41,
+    "last90": 41,
+    "perDay_30": 1.3666666666666667
+  },
+  "ieee_ai": {
+    "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",
+    "ok": true,
+    "status": 200,
+    "total": 30,
+    "last7": 4,
+    "last30": 17,
+    "last90": 30,
+    "perDay_30": 0.5666666666666667
+  }
+}
