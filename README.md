@@ -1,8 +1,15 @@
-# news-cast-ai
+# 🤖 news-cast-ai
+
+[![Tests](https://img.shields.io/github/actions/workflow/status/DENISOV-SERGEI/news-cast-ai/tests.yml?label=Tests&logo=github&logoColor=white)](https://github.com/DENISOV-SERGEI/news-cast-ai/actions)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES2020%2B-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Multi-channel автопостинг новостей об ИИ: парсинг RSS/HTML → двухэтапная адаптация через Ollama Cloud (DeepSeek-V4-Flash для summary, DeepSeek-V4-Pro для social-блоков) → генерация картинок через ProxyAPI → параллельная публикация в **Telegram** (основной канал), **VK** (wall.post в группе), **WordPress** (черновик через REST API), **Яндекс Дзен через @zen_sync_bot** (расширенная `yandex_dzen`-версия в отдельный публичный Telegram-канал) и **markdown-черновик для Дзена** (для ручной публикации). Дополнительно экспортирует **секцию новостей и страницы статей на статический сайт business_card** (`news.json`, `articles.html`, `articles/*.html` — регламент «топ-10 за 14 дней»). Поддерживает ручную модерацию через `--review`, graceful shutdown, rate-limit гейты для Telegram/VK, ретраи с экспоненциальной задержкой и наблюдаемость через `database/runs.json` + ежедневный отчёт в `TELEGRAM_ERROR_CHAT_ID`.
 
-## Архитектура
+![Пайплайн news-cast-ai](assets/pipeline.svg)
+
+## 🏗 Архитектура
 
 ```
 [URL источника]                  ┐
@@ -35,7 +42,7 @@ Multi-channel автопостинг новостей об ИИ: парсинг 
 [10. monitoring.js]       → алерты + ежедневный отчёт в TELEGRAM_ERROR_CHAT_ID
 ```
 
-### Модули
+### 🧩 Модули
 
 | Модуль | Что делает | Что порождает |
 |---|---|---|
@@ -63,7 +70,7 @@ Multi-channel автопостинг новостей об ИИ: парсинг 
 | `src/retry.js` | `retryWithBackoff(fn, { retries, baseMs, factor, maxMs, jitterMs, retryOn(err) })` — повторяет только если `err.retryable === true`; уважает `err.retryAfter` (429) | — |
 | `src/rateLimit.js` | Per-name гейт минимального интервала (`'telegram'`, `'vk'`); слот резервируется синхронно до `await` | — |
 
-## Структура проекта
+## 📁 Структура проекта
 
 ```
 news_cast_ai/
@@ -105,7 +112,7 @@ news_cast_ai/
 └── README.md
 ```
 
-## Требования
+## ⚙️ Требования
 
 - **Node.js ≥ 18** (используются встроенные `fetch`, `FormData`, `Blob`, `AbortController`).
 - **Telegram-бот** с правом публиковать сообщения в канале/группе.
@@ -113,7 +120,7 @@ news_cast_ai/
 - Аккаунт **ProxyAPI** с положительным балансом (генерация картинок).
 - Опционально: **VK** (access token сообщества + group_id) и **WordPress-сайт** (REST API + application password) — если переменные не заданы, соответствующие каналы просто пропускаются.
 
-## Установка
+## 🚀 Установка
 
 ```bash
 cd news_cast_ai
@@ -124,7 +131,7 @@ cp .env.example .env
 
 `.env` уже добавлен в `.gitignore`. Перед `git add .` проверьте `git status`.
 
-## Как получить токены
+## 🔑 Как получить токены
 
 ### Telegram Bot API
 
@@ -171,7 +178,7 @@ cp .env.example .env
 
 Что попадает в канал: расширенный `social.yandex_dzen` (title + description + draft + хештеги) — **не** короткий `social.telegram`. Если текст влезает в 1024 символа — отправляется одним `sendPhoto` с подписью. Если больше — `sendPhoto` с короткой подписью и отдельный `sendMessage` с полным текстом (Синхробот склеивает их в Дзене). Если не задано — `drafts/dzen-N.md` остаётся для ручной публикации в редакторе Дзена.
 
-## Запуск
+## ▶️ Запуск
 
 ```bash
 # один прогон
@@ -192,7 +199,7 @@ node src/index.js --publish-pending 20260823-125014-abc12
 
 Поведение по умолчанию: **3 свежих статьи** (`ARTICLES_PER_RUN`) → `sessions/дата/article-*.txt` + `sources.json` → 2 вызова Ollama на статью (summary + social) → `posts/*.json` → 1 вызов ProxyAPI (с кэшем) → параллельная публикация в Telegram (основной канал) + VK (если настроен) + Telegram-канал для @zen_sync_bot (если задан `TELEGRAM_DZEN_SYNC_CHAT_ID`) + WordPress (если настроен) + `drafts/dzen-N.md` → экспорт на бизнес-кард (`news.json`, `articles.html`, `articles/*.html`; выключить — `BUSINESS_CARD_NEWS_PATH=off` / `SITE_ARTICLES_DIR=off`). **Первый** пост публикуется сразу, **каждый следующий** — через `POST_INTERVAL_MS` (по умолчанию 60 000 мс = 1 минута).
 
-## Артефакты прогона
+## 📦 Артефакты прогона
 
 После `--once` (или внутри `--schedule`) создаются:
 
@@ -266,7 +273,7 @@ published_at: ...
 <чистый текст статьи>
 ```
 
-## Конфигурация (`.env`)
+## ⚙️ Конфигурация (`.env`)
 
 | Переменная | Обязательная | Дефолт | Назначение |
 |---|---|---|---|
@@ -319,7 +326,7 @@ published_at: ...
 
 `ANTHROPIC_API_KEY` **не используется** — это ключ самого Claude Code, он не должен попадать в эти скрипты.
 
-## Команды CLI
+## 💻 Команды CLI
 
 ```bash
 # Один прогон (по умолчанию)
@@ -344,14 +351,14 @@ node src/index.js --help
 
 Источники: `SOURCES` (CSV) из `.env` имеет приоритет над URL из CLI. Если заданы оба — URL из CLI игнорируется с предупреждением в логе.
 
-## Мониторинг
+## 📊 Мониторинг
 
 - **`TELEGRAM_ERROR_CHAT_ID`** — чат (обычно личный, положительный ID), куда `monitoring.js` шлёт алерты об ошибках (HTML, `disable_web_page_preview`). Не задан → алерты подавляются.
 - **Ежедневный отчёт** — раз в 24 часа после scheduled-прогона `monitoring.js` агрегирует записи из `database/runs.json` (`summarizeRuns`) и шлёт сводку: число прогонов по режимам, `found/processed/ok/fail/interrupted`, `stale/no_date`, токены Ollama (`prompt/completion/total`).
 - **`database/runs.json`** — история последних 500 прогонов. Каждая запись: `started_at`, `finished_at`, `duration_ms`, `mode` (`once`/`dry-run`/`review`/`publish-pending`), `sources`, `found`, `fresh_count`, `no_date_count`, `stale_count`, `dedup_skipped`, `processed`, `ok`, `fail`, `interrupted`, `pending_id`, `tokens`.
 - **Дедуп** — `database/published.json` хранит `urls: { normalizedUrl → { title, slug } }` и `slugs: { slug → { url } }`. При первом запуске мигрирует из `posts/*.json` (если индекс пуст).
 
-## Ручная модерация
+## 🧐 Ручная модерация
 
 Режим `--review` отделяет генерацию от публикации. Полезно, когда тексты нужно сначала посмотреть глазами.
 
@@ -368,7 +375,7 @@ node src/index.js --publish-pending <id>
 
 `pending/<id>/` self-contained: содержит **копии картинок** (не зависит от `images/`, который может перезаписаться следующим прогоном), `manifest.json` со статусом каждой статьи (`pending`/`published`/`failed`/`skipped`) и `preview.md` с человекочитаемыми текстами Telegram/VK. Идемпотентность `markPublished` (в `dedup.js`) позволяет безопасно перезапускать `--publish-pending` — дубликаты не появятся.
 
-## Graceful shutdown
+## 🛑 Graceful shutdown
 
 В режиме `--schedule` (и `--once`) перехватываются `SIGINT` и `SIGTERM` (`installShutdownHandlers` в `scheduler.js`):
 
@@ -377,14 +384,14 @@ node src/index.js --publish-pending <id>
 
 Код выхода при штатном прерывании: `130` (стандарт для «прервано пользователем»: `128 + SIGINT`).
 
-## Безопасность
+## 🔒 Безопасность
 
 - Все секреты хранятся в `.env`, который **уже добавлен в `.gitignore`**. Перед `git add .` проверяйте `git status`.
 - **`ANTHROPIC_API_KEY` не используется** и не должен попадать в скрипты. Claude CLI авторизуется самостоятельно.
 - Все внешние HTTP-вызовы идут через `fetchWithTimeout` с явными `timeoutMs` (15 с для проверок, 30 с для Telegram, 60 с для ProxyAPI / VK upload, 120 с для Ollama). Зависший API не подвешивает прогон.
 - Telegram `sendPhoto` **не ретраится на сетевых таймаутах** — мы не знаем, дошёл ли запрос, и повтор рискует дублем. Только HTTP 429/5xx → retry.
 
-## Устранение неполадок
+## 🆘 Устранение неполадок
 
 | Симптом | Решение |
 |---|---|

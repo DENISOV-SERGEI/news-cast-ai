@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: node --test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    # Фейковые значения обязательных переменных: тесты мокают сеть и не делают
+    # реальных запросов, но config.js требует их наличие при импорте.
+    env:
+      TELEGRAM_BOT_TOKEN: fake_test_token
+      TELEGRAM_CHAT_ID: '123456789'
+      PROXY_API_KEY: fake_proxy_key
+      OLLAMA_API_BASE: https://ollama.com
+      OLLAMA_API_KEY: fake_ollama_key
+      VK_ACCESS_TOKEN: fake_vk_token
+      VK_GROUP_ID: '123456789'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
