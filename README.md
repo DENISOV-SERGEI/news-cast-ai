@@ -1,7 +1,7 @@
 # 🤖 news-cast-ai
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/DENISOV-SERGEI/news-cast-ai/tests.yml?label=Tests&logo=github&logoColor=white)](https://github.com/DENISOV-SERGEI/news-cast-ai/actions)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES2020%2B-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -114,7 +114,7 @@ news_cast_ai/
 
 ## ⚙️ Требования
 
-- **Node.js ≥ 18** (используются встроенные `fetch`, `FormData`, `Blob`, `AbortController`).
+- **Node.js ≥ 20** (используются встроенные `fetch`, `FormData`, `Blob`, `AbortController`; `cheerio` тянет `undici` 7.x, который требует Node 20+).
 - **Telegram-бот** с правом публиковать сообщения в канале/группе.
 - Аккаунт **Ollama Cloud** с валидным API-ключом (двухэтапная адаптация).
 - Аккаунт **ProxyAPI** с положительным балансом (генерация картинок).
