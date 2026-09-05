@@ -38,7 +38,7 @@ function parseArgs(argv) {
       }
       args.publishPendingId = id;
       i++; // пропускаем id
-    } else if (a === '--once' || a === '--schedule' || a === '--dry-run' || a === '--review') {
+    } else if (a === '--once' || a === '--schedule' || a === '--dry-run' || a === '--review' || a === '--health') {
       args.flags.add(a.slice(2));
     } else if (a.startsWith('--')) {
       console.error(`Неизвестный флаг: ${a}`);
@@ -66,12 +66,16 @@ function printHelp() {
                        (ручная модерация; превью — pending/<id>/preview.md)
   --schedule           long-running режим с node-cron (SCHEDULE_CRON из .env)
   --publish-pending <id>  опубликовать посты из ранее созданного review-прогона
+  --health             проверка «молчания»: алерт в error-чат, если последний
+                       прогон старше SILENCE_ALERT_HOURS (для внешнего cron);
+                       exit code 0 = жив, 1 = молчит
 
 Примеры:
   node src/index.js https://www.artificialintelligence-news.com/feed --dry-run
   node src/index.js https://www.artificialintelligence-news.com/feed --review
   node src/index.js --publish-pending 20260823-125014-abc12
   node src/index.js https://www.artificialintelligence-news.com/feed --schedule
+  node src/index.js --health
 `);
 }
 
@@ -80,6 +84,32 @@ async function main() {
 
   if (args.help) {
     printHelp();
+    return;
+  }
+
+  // --health: проверка «молчания» — алерт, если последний прогон старше
+  // SILENCE_ALERT_HOURS (или истории нет). Вешается на внешний cron: умерший
+  // --schedule сам о себе не сообщит. Exit code: 0 = всё живо, 1 = молчит.
+  if (args.flags.has('health')) {
+    const { checkSilence } = await import('./monitoring.js');
+    try {
+      const res = await checkSilence();
+      if (!res.silent) {
+        log('info', '[health] OK: прогоны идут по расписанию (алерт не требуется)');
+        process.exitCode = 0;
+      } else if (!res.alerted) {
+        log('warn', `[health] Пайплайн молчит, но алерт не отправлен (TELEGRAM_ERROR_CHAT_ID не задан): ${res.reason}`);
+        process.exitCode = 1;
+      } else {
+        log('warn', `[health] Пайплайн молчит, алерт отправлен в error-чат: ${res.reason}`);
+        process.exitCode = 1;
+      }
+    } catch (e) {
+      log('error', `[health] Проверка не удалась: ${e.message}`);
+      process.exitCode = 1;
+    } finally {
+      try { closeLogger(); } catch { /* noop */ }
+    }
     return;
   }
 

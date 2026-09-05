@@ -91,6 +91,43 @@ export async function reportInfo(message, context) {
 
 const DAILY_REPORT_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Проверка «молчания» пайплайна: если последний прогон в runs.json старше
+ * SILENCE_ALERT_HOURS (или истории нет вовсе) — алерт в TELEGRAM_ERROR_CHAT_ID.
+ *
+ * Вызывается из CLI-режима `--health`, который вешается на внешний cron
+ * (планировщик ОС или CI): умерший long-running процесс сам о своей смерти
+ * сообщить не может, поэтому проверка идёт снаружи.
+ *
+ * @returns {Promise<{silent: boolean, reason: string|null, lastRunMs: number|null, alerted: boolean}>}
+ */
+export async function checkSilence() {
+  const hours = config.silenceAlertHours;
+  if (hours === 0) {
+    return { silent: false, reason: null, lastRunMs: null, alerted: false };
+  }
+  const { getLastRunMs } = await import('./runs.js');
+  const lastRunMs = await getLastRunMs();
+  const now = Date.now();
+  let silent = false;
+  let reason = null;
+  if (lastRunMs === null) {
+    silent = true;
+    reason = 'История прогонов пуста (database/runs.json отсутствует или не содержит записей)';
+  } else if (now - lastRunMs > hours * 3600 * 1000) {
+    silent = true;
+    const hoursSince = Math.floor((now - lastRunMs) / 3600_000);
+    reason = `Последний прогон был ${hoursSince} ч назад (${new Date(lastRunMs).toISOString()})`;
+  }
+  if (!silent) {
+    return { silent: false, reason: null, lastRunMs, alerted: false };
+  }
+  const alerted = await reportInfo(
+    `⚠️ Пайплайн молчит: ${reason}. Проверьте, что запущен режим --schedule. (SILENCE_ALERT_HOURS=${hours})`,
+  );
+  return { silent, reason, lastRunMs, alerted };
+}
+
 /** Человекочитаемый текст сводки прогонов (HTML, для sendMessage). */
 export function buildDailyReportText(summary, sinceIso) {
   const modeStr = Object.entries(summary.byMode)

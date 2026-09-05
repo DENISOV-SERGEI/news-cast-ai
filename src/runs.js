@@ -104,6 +104,20 @@ export async function getRunsSince(sinceMs) {
   return runs.filter((r) => Date.parse(r.finished_at || r.started_at) >= sinceMs);
 }
 
+/**
+ * Время (ms) последнего прогона по finished_at/started_at
+ * или null, если истории нет. Используется проверкой «молчания» (--health).
+ */
+export async function getLastRunMs() {
+  const runs = await getRuns();
+  let last = null;
+  for (const r of runs) {
+    const t = Date.parse(r.finished_at || r.started_at);
+    if (t && (last === null || t > last)) last = t;
+  }
+  return last;
+}
+
 /** Время последнего отправленного ежедневного отчёта (ms) или null. */
 export async function getLastDailyReportMs() {
   const index = await readIndex();

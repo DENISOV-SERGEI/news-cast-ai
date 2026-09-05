@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { mkdir, rm } from 'node:fs/promises';
+import { rm } from 'node:fs/promises';
 import { existsSync as existsSyncSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -129,6 +129,7 @@ test('generateImage: картинка 1200x900 от API даунскейлитс
     const saved = await Jimp.read(r.filepath);
     assert.equal(saved.bitmap.width, TARGET_IMAGE_SIZE_PX);
     assert.equal(saved.bitmap.height, TARGET_IMAGE_SIZE_PX);
+    assert.equal(requests, 1, 'сервер получил ровно один запрос генерации');
   } finally {
     srv.close();
   }

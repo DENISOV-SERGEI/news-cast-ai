@@ -28,6 +28,56 @@ import { config, log } from './config.js';
 import { articleFilename } from './siteArticles.js';
 
 const DEFAULT_MAX_ITEMS = 10;
+
+/** XML-эскейпинг для текстовых узлов и атрибутов RSS. */
+function escapeXml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Собирает RSS 2.0 XML из карточек новостей (экспортирована для тестов).
+ *
+ * @param {Array<{title: string, url: string, article_url: string, date: string, source: string}>} items
+ * @param {object} [opts]
+ * @param {string} [opts.siteUrl] — публичный базовый URL сайта (DEPLOY_SITE_URL);
+ *   задан → <link> элементов абсолютный (articles/<slug>.html от базы);
+ *   пуст → относительный, как в news.json.
+ * @param {string|Date} [opts.updatedAt] — время сборки (lastBuildDate).
+ * @returns {string}
+ */
+export function buildRssXml(items, opts = {}) {
+  const base = String(opts.siteUrl || '').replace(/\/+$/, '');
+  const updatedAt = opts.updatedAt || new Date();
+  const itemsXml = items.map((it) => {
+    const link = base
+      ? `${base}/${String(it.article_url).replace(/^\//, '')}`
+      : it.article_url;
+    return `    <item>
+      <title>${escapeXml(it.title)}</title>
+      <link>${escapeXml(link)}</link>
+      <guid>${escapeXml(link)}</guid>
+      <pubDate>${new Date(it.date).toUTCString()}</pubDate>
+      <source>${escapeXml(it.source)}</source>
+    </item>`;
+  }).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Новости AI</title>
+    <link>${escapeXml(base || 'news.json')}</link>
+    <description>Свежие новости об искусственном интеллекте</description>
+    <language>ru</language>
+    <lastBuildDate>${new Date(updatedAt).toUTCString()}</lastBuildDate>
+${itemsXml}
+  </channel>
+</rss>
+`;
+}
 // Регламент «топ-10 за N дней»: в выдачу попадают только статьи не старше
 // этого числа дней (по published_at, fallback — mtime файла). 0 = без фильтра.
 // С 2026-09-05 окно расширено с 5 до 14 дней (по выбору владельца).
@@ -178,5 +228,20 @@ export async function exportSiteNews(opts = {}) {
   await rename(tmp, outPath);
 
   log('info', `[site-news] news.json обновлён: ${outPath} (${items.length}/${all.length} новостей)`);
+
+  // RSS-фид рядом с news.json (SITE_RSS_PATH может переопределить путь;
+  // SITE_RSS_PATH=off выключает генерацию — см. features.siteRss).
+  if (config.features.siteRss) {
+    const rssPath = config.siteRssPath || path.join(outDir, 'rss.xml');
+    const rssXml = buildRssXml(items, {
+      siteUrl: config.deploySiteUrl,
+      updatedAt: payload.updated_at,
+    });
+    const tmpRss = `${rssPath}.tmp`;
+    await writeFile(tmpRss, rssXml, 'utf-8');
+    await rename(tmpRss, rssPath);
+    log('info', `[site-news] rss.xml обновлён: ${rssPath} (${items.length} новостей)`);
+  }
+
   return { filepath: outPath, items: items.length };
 }

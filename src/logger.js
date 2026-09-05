@@ -87,7 +87,7 @@ async function _rotateIfNeeded() {
   try {
     _openSync(_logFile);
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.warn(`[logger] Не удалось открыть ${_logFile}: ${e.message}. Лог-файл отключён.`);
     _logFile = '';
   }
@@ -152,7 +152,7 @@ export async function initLogger(config) {
     await mkdir(dirname(_logFile), { recursive: true });
     await _rotateIfNeeded();
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.warn(`[logger] Не удалось открыть ${_logFile}: ${e.message}. Лог-файл отключён.`);
     _logFile = '';
     _closeFd();

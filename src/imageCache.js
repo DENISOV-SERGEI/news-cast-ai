@@ -47,7 +47,7 @@ async function readIndex() {
     return cached;
   }
   try {
-    const parsed = JSON.parse(await readFile(file, 'utf-8'));
+    let parsed = JSON.parse(await readFile(file, 'utf-8'));
     if (!parsed || typeof parsed !== 'object' || !parsed.entries) parsed = emptyIndex();
     else parsed.version = parsed.version || SCHEMA_VERSION;
     cached = parsed;

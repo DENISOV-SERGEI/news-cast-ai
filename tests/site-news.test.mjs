@@ -10,7 +10,7 @@ import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { config } from '../src/config.js';
-import { exportSiteNews, collectSiteNewsItems } from '../src/siteNews.js';
+import { exportSiteNews, collectSiteNewsItems, buildRssXml } from '../src/siteNews.js';
 
 // Уникальный временный каталог (параллельный запуск node --test).
 const tmpRoot = path.join(tmpdir(), `nca-sitenews-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
@@ -114,8 +114,64 @@ test('siteNews: элементы без url/title не попадают в вы�
 test('siteNews: атомарная запись — tmp-файл не остаётся', async () => {
   await exportSiteNews({ freshDays: 30 });
   const files = await readdir(outDir);
-  assert.deepEqual(files.sort(), ['news.json']);
+  assert.deepEqual(files.sort(), ['news.json', 'rss.xml']);
   assert.ok(!existsSync(`${outFile}.tmp`));
+});
+
+test('siteNews: rss.xml генерируется рядом с news.json', async () => {
+  await exportSiteNews({ freshDays: 30 });
+  const rssFile = path.join(outDir, 'rss.xml');
+  const raw = await readFile(rssFile, 'utf-8');
+  assert.match(raw, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+  assert.match(raw, /<rss version="2\.0">/);
+  assert.match(raw, /<language>ru<\/language>/);
+  assert.match(raw, /<lastBuildDate>.+<\/lastBuildDate>/);
+  // Элементы — в том же порядке свежести, что и в news.json
+  const titles = [...raw.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => m[1]);
+  assert.ok(titles.includes('Новости AI')); // title канала
+  assert.ok(titles.includes('Свежая новость'));
+  // Русские заголовки не эскейпнуты как unicode
+  assert.ok(raw.includes('Свежая новость'));
+});
+
+test('siteNews: buildRssXml — эскейпинг спецсимволов', () => {
+  const xml = buildRssXml([{
+    title: 'OpenAI & "агенты" <вышли> в интернет',
+    url: 'https://example.com/a&b',
+    article_url: 'articles/x.html',
+    date: '2026-09-05',
+    source: 'example.com',
+  }], { siteUrl: '' });
+  assert.ok(xml.includes('<title>OpenAI &amp; &quot;агенты&quot; &lt;вышли&gt; в интернет</title>'));
+  // Битых XML-узлов не осталось
+  assert.ok(!xml.includes('<title>OpenAI & '));
+  assert.match(xml, /<link>articles\/x\.html<\/link>/); // без siteUrl — относительная ссылка
+});
+
+test('siteNews: buildRssXml — абсолютные ссылки при заданном siteUrl', () => {
+  const xml = buildRssXml([{
+    title: 'Тест',
+    url: 'https://example.com/a',
+    article_url: 'articles/x.html',
+    date: '2026-09-05',
+    source: 'example.com',
+  }], { siteUrl: 'https://your-site.ru/' }); // слэш на конце срезается
+  assert.match(xml, /<link>https:\/\/your-site\.ru\/articles\/x\.html<\/link>/);
+  assert.match(xml, /<link>https:\/\/your-site\.ru<\/link>/); // link канала
+  assert.match(xml, /<pubDate>Sat, 05 Sep 2026 00:00:00 GMT<\/pubDate>/);
+});
+
+test('siteNews: SITE_RSS_PATH=off → rss.xml не генерируется', async () => {
+  const rssFile = path.join(outDir, 'rss.xml');
+  await rm(rssFile, { force: true });
+  config.features.siteRss = false;
+  try {
+    await exportSiteNews({ freshDays: 30 });
+    assert.ok(existsSync(outFile), 'news.json пишется как обычно');
+    assert.ok(!existsSync(rssFile), 'rss.xml не создан');
+  } finally {
+    config.features.siteRss = true; // восстановить
+  }
 });
 
 test('siteNews: BUSINESS_CARD_NEWS_PATH=off → экспорт пропускается', async () => {

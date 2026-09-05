@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs';
-import * as cheerio from 'cheerio';
 
 const FEEDS = [
   'https://venturebeat.com/category/orchestration',

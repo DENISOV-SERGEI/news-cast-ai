@@ -71,7 +71,7 @@ test('retryWithBackoff: сдаётся после retries попыток и пр
   assert.equal(calls, 3);
 });
 
-test('retryWithBackoff: уважает err.retryAfter (секунды→мс) вместо экспоненты', async (t) => {
+test('retryWithBackoff: уважает err.retryAfter (секунды→мс) вместо экспоненты', async () => {
   //retryAfter в секундах; берём маленькое значение и проверяем, что ждём ~retryAfter*1000,
   //а не baseMs*factor^0. Чтобы тест не висел секунды, retryAfter = 0.02 (20мс).
   let calls = 0;

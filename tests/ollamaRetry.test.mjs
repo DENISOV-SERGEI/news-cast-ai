@@ -114,7 +114,6 @@ test('tryCallOllama: сетевая ошибка — retryable=true', async () =
 });
 
 test('tryCallOllama: data.error (например, неизвестная модель) — фатально', async () => {
-  const fetchFn = makeFetch(() => okJson('', {}));
   // Подменим тело через кастомный Response
   const fakeFetch = async () => new Response(JSON.stringify({
     error: { message: 'model "foo" not found' },

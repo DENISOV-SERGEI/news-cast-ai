@@ -17,7 +17,7 @@
 import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import cron from 'node-cron';
-import { fetchAndParse, fetchAndParseAll, parseWithStats, parseAllWithStats, persistArticles, NoFreshArticlesError } from './parser.js';
+import { parseWithStats, parseAllWithStats, persistArticles, NoFreshArticlesError } from './parser.js';
 import { adaptArticle } from './adapter.js';
 import { generateImage } from './imageGenerator.js';
 import { publishPost } from './publisher.js';
@@ -162,7 +162,7 @@ export async function pickBySource(articles, dedupFn) {
   for (const { list } of groupOrder) {
     let found = null;
     for (const a of list) {
-      // eslint-disable-next-line no-await-in-loop
+       
       const dup = await dedupFn(a);
       if (dup && dup.duplicate) {
         droppedDup++;
@@ -683,7 +683,6 @@ export async function publishPending(id) {
     let telegramOk = alreadyTg;
     let vkOk = alreadyVk;
     let siteOk = alreadySite;
-    let zenOk = alreadyZen;
     let dzenSyncOk = alreadyDzenSync;
     let anyChannelOk = alreadyTg || alreadyVk || alreadySite || alreadyZen || alreadyDzenSync;
     if (alreadyTg) log('info', `[publish-pending] Статья ${art.articleId}: Telegram уже опубликован (${perStep.telegram})`);

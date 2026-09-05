@@ -24,6 +24,7 @@
 
 import SftpClient from 'ssh2-sftp-client';
 import { readdir, stat } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { config, log } from './config.js';
 import { retryWithBackoff } from './retry.js';
@@ -77,6 +78,14 @@ async function deployOnce() {
     // 1) news.json
     await uploadWithCheck(sftp, baseDir, config.businessCardNewsPath, 'news.json');
     uploadedFiles++;
+
+    // 1b) rss.xml (генерируется рядом с news.json; SITE_RSS_PATH=off — файла нет)
+    const rssPath = config.siteRssPath
+      || path.join(path.dirname(config.businessCardNewsPath), 'rss.xml');
+    if (existsSync(rssPath)) {
+      await uploadWithCheck(sftp, baseDir, rssPath, 'rss.xml');
+      uploadedFiles++;
+    }
 
     // 2) articles.html
     await uploadWithCheck(sftp, baseDir, config.siteArticlesListPath, 'articles.html');

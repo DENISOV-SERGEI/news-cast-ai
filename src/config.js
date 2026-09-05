@@ -144,6 +144,14 @@ export const config = {
     return resolve(projectRoot, rel);
   })(),
   siteArticlesListPath: resolve(projectRoot, optional('SITE_ARTICLES_LIST_PATH', '../business_card/articles.html')),
+  // RSS-фид секции новостей. По умолчанию rss.xml генерируется рядом с news.json
+  // (dirname от businessCardNewsPath). SITE_RSS_PATH задаёт явный путь;
+  // SITE_RSS_PATH=off отключает генерацию фида (см. features.siteRss).
+  siteRssPath: (() => {
+    const v = optional('SITE_RSS_PATH', '');
+    if (/^off$/i.test(v)) return null;
+    return v ? resolve(projectRoot, v) : null;
+  })(),
 
   // --- Автодеплой сайта business_card на хостинг по SFTP/SSH (опционально) ---
   // После экспорта news.json/articles.html/articles/*.html пайплайн автоматически
@@ -209,6 +217,20 @@ export const config = {
   postIntervalMs: intOpt('POST_INTERVAL_MS', 60_000),
   // node-cron выражение для расписания. По умолчанию — каждые 2 часа.
   scheduleCron: optional('SCHEDULE_CRON', '0 */2 * * *'),
+  // Алерт о «молчании»: если последний прогон в database/runs.json старше
+  // SILENCE_ALERT_HOURS часов (или истории нет вовсе), CLI-режим
+  // `node src/index.js --health` шлёт алерт в TELEGRAM_ERROR_CHAT_ID
+  // и выходит с кодом 1 — удобно вешать на внешний cron/планировщик.
+  // 0 — проверка отключена.
+  silenceAlertHours: (() => {
+    const v = process.env.SILENCE_ALERT_HOURS;
+    if (v === undefined || v.trim() === '') return 6;
+    const n = Number.parseInt(v, 10);
+    if (Number.isNaN(n) || n < 0) {
+      throw new Error(`Переменная SILENCE_ALERT_HOURS должна быть целым числом >= 0, получено: "${v}"`);
+    }
+    return n;
+  })(),
 
   // Текст ссылки на оригинал статьи, которую паблишеры добавляют в конце
   // публикации во все каналы (Telegram/VK/Yandex Dzen/Site Blog).
@@ -249,6 +271,8 @@ config.features = {
   // Страница статей (полные тексты) для business_card включена по умолчанию;
   // отключается значением SITE_ARTICLES_DIR=off.
   siteArticles: !/^off$/i.test(optional('SITE_ARTICLES_DIR', '')),
+  // RSS-фид секции новостей включён по умолчанию; отключается SITE_RSS_PATH=off.
+  siteRss: !/^off$/i.test(optional('SITE_RSS_PATH', '')),
   // Автодеплой на хостинг по FTP/SFTP активен, если заданы все DEPLOY_FTP_*.
   deploySite: Boolean(optional('DEPLOY_FTP_HOST', '') && optional('DEPLOY_FTP_USER', '') && optional('DEPLOY_FTP_PASS', '')),
   // Авто-обход SiteGround-капчи включён по умолчанию (если не отключён явно).
@@ -260,7 +284,7 @@ export function log(level, message, extra) {
   if (order[level] < order[config.logLevel]) return;
   const ts = new Date().toISOString();
   const tail = extra ? ` ${JSON.stringify(extra)}` : '';
-  // eslint-disable-next-line no-console
+   
   console[level === 'debug' ? 'log' : level](`[${ts}] [${level.toUpperCase()}] ${message}${tail}`);
   // Дополнительно — дубль в файл через ./logger.js (если initLogger был вызван).
   // Импорт динамический, чтобы не ломать загрузку config.js (logger может упасть).
@@ -291,6 +315,6 @@ import('./logger.js')
     _fileLogger = { log: mod.log };
   })
   .catch((e) => {
-    // eslint-disable-next-line no-console
+     
     console.warn(`[logger] init не удался: ${e.message}. Логи только в console.`);
   });

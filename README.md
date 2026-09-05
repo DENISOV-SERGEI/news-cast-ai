@@ -262,6 +262,7 @@ news_cast_ai/
 ```
 ../business_card/
 ├── news.json            # последние 10 новостей за 14 дней
+├── rss.xml              # RSS-фид секции новостей (SITE_RSS_PATH=off — не генерируется)
 ├── articles.html        # список статей
 └── articles/            # страницы статей <slug>.html
     └── <slug>.html      # полные тексты (site_blog.draft), остальное — удаляется
@@ -331,6 +332,8 @@ published_at: ...
 | `BUSINESS_CARD_NEWS_PATH` | нет | `../business_card/news.json` | Путь к `news.json` сайта business_card; `off` — экспорт секции новостей отключён |
 | `SITE_ARTICLES_DIR` | нет | `../business_card/articles` | Каталог страниц статей сайта business_card; `off` — экспорт статей отключён |
 | `SITE_ARTICLES_LIST_PATH` | нет | `../business_card/articles.html` | Путь к списку статей `articles.html` |
+| `SITE_RSS_PATH` | нет | `rss.xml` рядом с `news.json` | Путь к RSS-фиду секции новостей; `off` — фид не генерируется |
+| `SILENCE_ALERT_HOURS` | нет | `6` | Порог для `--health`: алерт, если последний прогон старше N часов; `0` — проверка отключена |
 | `DEPLOY_FTP_HOST` | нет | `''` | Хост хостинга (SFTP/SSH); вместе с `USER`/`PASS` включает автодеплой |
 | `DEPLOY_FTP_PORT` | нет | `21` | Порт FTP (не используется для SFTP) |
 | `DEPLOY_SFTP_PORT` | нет | `22` | Порт SFTP/SSH для автодеплоя |
@@ -369,6 +372,10 @@ node src/index.js <URL> --review
 # Публикация ранее сгенерированного review-прогона
 node src/index.js --publish-pending <id>
 
+# Проверка «молчания» (для внешнего cron): алерт, если последний прогон
+# старше SILENCE_ALERT_HOURS; exit code 0 = жив, 1 = молчит
+node src/index.js --health
+
 # Справка
 node src/index.js --help
 ```
@@ -378,6 +385,7 @@ node src/index.js --help
 ## 📊 Мониторинг
 
 - **`TELEGRAM_ERROR_CHAT_ID`** — чат (обычно личный, положительный ID), куда `monitoring.js` шлёт алерты об ошибках (HTML, `disable_web_page_preview`). Не задан → алерты подавляются.
+- **Проверка «молчания» (`--health`)** — умерший long-running `--schedule` сам о своей смерти не сообщит. Поэтому проверка идёт снаружи: `node src/index.js --health` читает `database/runs.json` и, если последний прогон старше `SILENCE_ALERT_HOURS` (по умолчанию 6, `0` — выкл) или истории нет вовсе, шлёт алерт в `TELEGRAM_ERROR_CHAT_ID` и выходит с кодом 1. Повесьте команду на планировщик ОС (например, раз в час) — так алерт придёт даже при падении машины.
 - **Ежедневный отчёт** — раз в 24 часа после scheduled-прогона `monitoring.js` агрегирует записи из `database/runs.json` (`summarizeRuns`) и шлёт сводку: число прогонов по режимам, `found/processed/ok/fail/interrupted`, `stale/no_date`, токены Ollama (`prompt/completion/total`).
 - **`database/runs.json`** — история последних 500 прогонов. Каждая запись: `started_at`, `finished_at`, `duration_ms`, `mode` (`once`/`dry-run`/`review`/`publish-pending`), `sources`, `found`, `fresh_count`, `no_date_count`, `stale_count`, `dedup_skipped`, `processed`, `ok`, `fail`, `interrupted`, `pending_id`, `tokens`.
 - **Дедуп** — `database/published.json` хранит `urls: { normalizedUrl → { title, slug } }` и `slugs: { slug → { url } }`. При первом запуске мигрирует из `posts/*.json` (если индекс пуст).
